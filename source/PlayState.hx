@@ -22,16 +22,10 @@ class PlayState extends FlxState
 		var level = new TiledLevel("assets/level.tmx", this);
 
 		player = new FlxSprite("assets/player.png");
-		player.x = 152;
-		player.y = 152;
+		player.x = 160;
+		player.y = 112;
 
 		coins = level.coins;
-
-		add(level.backgroundLayer);
-
-		add(level.imagesLayer);
-
-		add(coins);
 
 		add(player);
 
@@ -76,6 +70,14 @@ class PlayState extends FlxState
 		if (FlxG.keys.anyPressed([S, DOWN]))
 		{
 			player.velocity.y += velocity;
+		}
+
+		// restart
+		if(FlxG.keys.anyJustPressed(["R"]))
+		{
+			player = null;
+			coins = null;
+			FlxG.switchState(new PlayState());
 		}
 
 		// quit

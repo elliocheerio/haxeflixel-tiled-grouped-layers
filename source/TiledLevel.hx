@@ -28,11 +28,10 @@ class TiledLevel extends TiledMap
 	// used to draw tiles in that layer (without file extension). The image file must be located in the directory specified bellow.
 	inline static var c_PATH_LEVEL_TILESHEETS = "assets/";
 	
-	public var backgroundLayer:FlxGroup;
-	public var imagesLayer:FlxGroup;
+	private var backgroundLayer:FlxGroup;
+	private var imagesLayer:FlxGroup;
 	public var coins:FlxGroup;
-	var collidableTileLayers:Array<FlxTilemap>;
-	
+	private var playState:PlayState;
 	public var player:FlxSprite;
 	
 	public function new(tiledLevel:FlxTiledMapAsset, state:PlayState)
@@ -42,6 +41,7 @@ class TiledLevel extends TiledMap
 		imagesLayer = new FlxGroup();
 		backgroundLayer = new FlxGroup();
 		coins = new FlxGroup();
+		playState = state;
 		
 		FlxG.camera.setScrollBoundsRect(0, 0, fullWidth, fullHeight, true);
 		
@@ -50,6 +50,7 @@ class TiledLevel extends TiledMap
 
 	public function loadTiledLayers():Void
 	{
+
 		for (layer in layers)
 		{
 			switch (layer.type)
@@ -96,12 +97,7 @@ class TiledLevel extends TiledMap
 			tilemap.loadMapFromArray(tileLayer.tileArray, width, height, processedPath,
 				tileSet.tileWidth, tileSet.tileHeight, OFF, tileSet.firstGID, 1, 1);
 			
-			backgroundLayer.add(tilemap);
-
-			if (collidableTileLayers == null)
-				collidableTileLayers = new Array<FlxTilemap>();
-				
-			collidableTileLayers.push(tilemap);
+			playState.add(tilemap);
 	}
 
 	public function loadLayerObjects(layer:TiledLayer)
@@ -128,6 +124,7 @@ class TiledLevel extends TiledMap
 			case "coin":
 				var coin = new FlxSprite(x, y, "assets/coin.png");
 				coins.add(coin);
+				playState.add(coins);
 
 			default:
 				// no object type provided in Tiled
@@ -138,23 +135,6 @@ class TiledLevel extends TiledMap
 	{
 		var image:TiledImageLayer = cast layer;
 		var sprite = new FlxSprite(image.x, image.y, c_PATH_LEVEL_TILESHEETS + image.imagePath);
-		imagesLayer.add(sprite);
-	}
-	
-	public function collideWithLevel(obj:FlxObject, ?notifyCallback:FlxObject->FlxObject->Void, ?processCallback:FlxObject->FlxObject->Bool):Bool
-	{
-		if (collidableTileLayers == null)
-			return false;
-
-		for (map in collidableTileLayers)
-		{
-			// IMPORTANT: Always collide the map with objects, not the other way around.
-			//            This prevents odd collision errors (collision separation code off by 1 px).
-			if (FlxG.overlap(map, obj, notifyCallback, processCallback != null ? processCallback : FlxObject.separate))
-			{
-				return true;
-			}
-		}
-		return false;
+		playState.add(sprite);
 	}
 }
