@@ -53,6 +53,16 @@ class TiledLevel extends TiledMap
 
 		for (layer in layers)
 		{
+			if (layer == null)
+			{
+				continue;
+			}
+
+			var layerType = layer.type;
+			var parentLayerType = layer.parentLayer != null ? layer.parentLayer.type : null;
+
+			trace('layer type: ' + layerType + '; parent layer type: ' + parentLayerType);
+
 			switch (layer.type)
 			{
 				case TiledLayerType.TILE:
